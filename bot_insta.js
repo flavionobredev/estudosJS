@@ -5,7 +5,7 @@ var observer = new MutationObserver( handleMutationObserver );
 var config = { childList: true };
 
 /* articles */
-var articles
+var articles = []
 
 /* scroll interval status */
 var scrollInterval
@@ -21,9 +21,9 @@ var count = 0
 * obsever's callback
 */
 function handleMutationObserver(mutations){
-  mutations.forEach(function(mutation) {
-    console.log( mutation.type );
-  });
+//   mutations.forEach(function(mutation) {
+//     console.log( mutation.type );
+//   });
   scroll('stop')
   like()
 }
@@ -92,7 +92,7 @@ var generateTime = (min, max) => Math.floor(Math.random() * (max - min)) + min
  * @param {Number} ms time to sleep
  */
 var sleep = function(ms){
-	return new Promise(async (resolve) => await setTimeout(resolve, ms));
+	return new Promise(async (resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -118,18 +118,19 @@ var like = async () => {
 		return finish()
 	}
 	this.attArticles()
-	await articles.forEach( async (article) => {
+	await articles.reduce( async (acc, article) => {
+		await acc
 		var button = article.querySelectorAll('svg')[1]
 	    var buttonStatus = button.getAttribute('aria-label')
 	    if(buttonStatus === 'Curtir') {
 	    	let ms = generateTime(3000, 6000)
-	    	console.warn('Publicação para curtir encontrada. Tempo para curtir: ' + ms + 'ms')
-	    	console.log('Preparando-se para curtir...')
-	    	await sleep(ms)
+	    	console.log('Publicação encontrada.')
 	    	eventFire(button, 'click')
-	    	count++
 	    	console.log('Publicação curtida.')
+	    	count++
+	    	console.warn('Tempo para a próxima curtida: ' + ms + 'ms')
+	    	return sleep(ms)
 	    }
-	})
+	}, Promise.resolve())
 	scroll('start')
 }
