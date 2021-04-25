@@ -113,24 +113,40 @@ var eventFire = function(el, etype){
 /**
  * Main function
  */
+// var like = async () => {
+// 	if(count>=times){
+// 		return finish()
+// 	}
+// 	this.attArticles()
+// 	await articles.reduce( async (acc, article) => {
+// 		await acc
+// 		var button = article.querySelectorAll('svg')[1]
+// 	    var buttonStatus = button.getAttribute('aria-label')
+// 	    if(buttonStatus === 'Curtir') {
+// 	    	let ms = generateTime(3000, 6000)
+// 	    	console.log('Publicação encontrada.')
+// 	    	eventFire(button, 'click')
+// 	    	console.log('Publicação curtida.')
+// 	    	count++
+// 	    	console.warn('Tempo para a próxima curtida: ' + ms + 'ms')
+// 	    	return sleep(ms)
+// 	    }
+// 	}, Promise.resolve())
+// 	scroll('start')
+// }
+
 var like = async () => {
 	if(count>=times){
 		return finish()
 	}
 	this.attArticles()
-	await articles.reduce( async (acc, article) => {
-		await acc
-		var button = article.querySelectorAll('svg')[1]
-	    var buttonStatus = button.getAttribute('aria-label')
-	    if(buttonStatus === 'Curtir') {
-	    	let ms = generateTime(3000, 6000)
-	    	console.log('Publicação encontrada.')
-	    	eventFire(button, 'click')
-	    	console.log('Publicação curtida.')
-	    	count++
-	    	console.warn('Tempo para a próxima curtida: ' + ms + 'ms')
-	    	return sleep(ms)
-	    }
-	}, Promise.resolve())
+	articles.reduce( (p, _, i) => 
+	    p.then(_ => new Promise(resolve =>
+	        setTimeout(function () {
+	            console.log(i);
+	            resolve();
+	        }, generateTime(2000))
+	    ))
+	, Promise.resolve() );
 	scroll('start')
 }
