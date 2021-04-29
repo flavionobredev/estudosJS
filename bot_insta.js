@@ -16,6 +16,12 @@ var times = 25
 /* count liked posts */
 var count = 0
 
+/* count posts viewed */
+var viewedPosts = 0
+
+/* liked comments total */
+var likeAllCount = 0;
+
   
 /**
 * obsever's callback
@@ -25,7 +31,8 @@ function handleMutationObserver(mutations){
 //     console.log( mutation.type );
 //   });
   scroll('stop')
-  like()
+  attArticles()
+  like(articles)
 }
 
 /**
@@ -52,6 +59,7 @@ var finish = () => {
  * Update current articles
  */
 var attArticles = () => {
+	console.log('atualizei os articles')
 	articles = document.querySelectorAll('article')
 }
 
@@ -92,7 +100,7 @@ var generateTime = (min, max) => Math.floor(Math.random() * (max - min)) + min
  * @param {Number} ms time to sleep
  */
 var sleep = function(ms){
-	return new Promise(async (resolve) => setTimeout(resolve, ms));
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -113,40 +121,84 @@ var eventFire = function(el, etype){
 /**
  * Main function
  */
+var like = (articles) => {
+	if(count>=times){
+		return finish()
+	}
+	var posts = Array.from(articles) 
+	posts.forEach(async post => await new Promise(resolve => {
+		// console.log('posts analisados >>> ', viewedPosts++ )
+		
+		var buttons = post.querySelectorAll('svg')
+		var buttonsArray = Array.from(buttons)
+		var findDeslikeButton = buttonsArray.find(button => button.getAttribute('aria-label')==="Descurtir") 
+		var findLikeButton = buttonsArray.find(button => button.getAttribute('aria-label')==="Curtir")
+		if(!findDeslikeButton && findLikeButton){
+			// console.log(post)
+			// console.log(findLikeButton)
+			let ms = generateTime(3000, 6000)
+			// // console.log('Publicação encontrada.')
+			eventFire(findLikeButton, 'click')
+			// // console.log('Publicação curtida.')
+			count++
+			console.debug('posts curtidos >>>> ', count )
+			// // console.warn('Tempo para a próxima curtida: ' + ms + 'ms')
+			// resolve(sleep(ms))		
+		}
+	}), Promise.resolve())
+	scroll('start')
+}
+
+
+var likeAll = () => {
+	var buttons = document.querySelectorAll('svg')
+	var buttonsArray = Array.from(buttons)
+	var likeButtonsArray = buttonsArray.filter(button => button.getAttribute('aria-label')==="Curtir")
+	console.log("tamanho >>>>> ", likeButtonsArray.length)
+	// var doNextPromise = (index) => {
+	// 	const time = generateTime(3000, 5000)
+	// 	console.log(index)
+	// 	sleep(time).then(()=>{
+	// 		console.log(likeButtonsArray[index])
+	// 		index++
+	// 		if(index < likeButtonsArray.length)
+	// 			doNextPromise(index)
+	// 		return console.log('finish')
+	// 	})
+	// }
+
+	const doNextPromise = (index) => {
+		sleep(generateTime(2000, 5000))
+		  .then(() => {
+			console.debug('[all-comments] curtindo comentário ', index);
+			eventFire(likeButtonsArray[index], 'click')
+			index++;
+			likeAllCount++;
+			if (index < likeButtonsArray.length){
+				doNextPromise(index)
+			}
+			else{
+				console.debug("[all-comments] finalizado.");
+				console.debug('[all-comments] comentários curtidos hoje >>>>', likeAllCount )
+			}
+		  })
+	  }
+	console.debug(`[all-comments] ${likeButtonsArray.length} comentários para curtir. Iniciando...`)
+	doNextPromise(0)
+}
+
 // var like = async () => {
 // 	if(count>=times){
 // 		return finish()
 // 	}
 // 	this.attArticles()
-// 	await articles.reduce( async (acc, article) => {
-// 		await acc
-// 		var button = article.querySelectorAll('svg')[1]
-// 	    var buttonStatus = button.getAttribute('aria-label')
-// 	    if(buttonStatus === 'Curtir') {
-// 	    	let ms = generateTime(3000, 6000)
-// 	    	console.log('Publicação encontrada.')
-// 	    	eventFire(button, 'click')
-// 	    	console.log('Publicação curtida.')
-// 	    	count++
-// 	    	console.warn('Tempo para a próxima curtida: ' + ms + 'ms')
-// 	    	return sleep(ms)
-// 	    }
-// 	}, Promise.resolve())
+// 	articles.reduce( (p, _, i) => 
+// 	    p.then(_ => new Promise(resolve =>
+// 	        setTimeout(function () {
+// 	            console.log(i);
+// 	            resolve();
+// 	        }, generateTime(2000))
+// 	    ))
+// 	, Promise.resolve() );
 // 	scroll('start')
 // }
-
-var like = async () => {
-	if(count>=times){
-		return finish()
-	}
-	this.attArticles()
-	articles.reduce( (p, _, i) => 
-	    p.then(_ => new Promise(resolve =>
-	        setTimeout(function () {
-	            console.log(i);
-	            resolve();
-	        }, generateTime(2000))
-	    ))
-	, Promise.resolve() );
-	scroll('start')
-}
