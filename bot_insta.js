@@ -120,53 +120,67 @@ var eventFire = function(el, etype){
 
 /**
  * Main function
+ * @param {NodeList} articles articles to verify and like
  */
 var like = (articles) => {
+
+	/* verifica se o maximo de curtidas ja foi excedido */
 	if(count>=times){
 		return finish()
 	}
-	var posts = Array.from(articles) 
-	posts.forEach(async post => await new Promise(resolve => {
-		// console.log('posts analisados >>> ', viewedPosts++ )
-		
-		var buttons = post.querySelectorAll('svg')
+	var posts = Array.from(articles)
+
+	/**
+	 * executa de forma sequencial as promises de sleep
+	 * @param {Number} index 
+	 */
+	const doNextPromise = (index) => {
+		/* processo para encontrar os botoes de descurtir e curtir */
+		var buttons = posts[index].querySelectorAll('svg')
 		var buttonsArray = Array.from(buttons)
 		var findDeslikeButton = buttonsArray.find(button => button.getAttribute('aria-label')==="Descurtir") 
 		var findLikeButton = buttonsArray.find(button => button.getAttribute('aria-label')==="Curtir")
-		if(!findDeslikeButton && findLikeButton){
-			// console.log(post)
-			// console.log(findLikeButton)
-			let ms = generateTime(3000, 6000)
-			// // console.log('Publicação encontrada.')
-			eventFire(findLikeButton, 'click')
-			// // console.log('Publicação curtida.')
-			count++
-			console.debug('posts curtidos >>>> ', count )
-			// // console.warn('Tempo para a próxima curtida: ' + ms + 'ms')
-			// resolve(sleep(ms))		
-		}
-	}), Promise.resolve())
-	scroll('start')
+
+		// TODO: Ver forma de otimizar curtida pois: esta esperando timeout  ate de publicação ja curtida
+		sleep(generateTime(1000, 5000))
+		.then(() => {
+			
+			/* verifica se não existe uma publicação já curtida e se há botão de like  */
+			if (!findDeslikeButton && findLikeButton){
+				/* busca saber de quem é a postagem */
+				var usernameContent = posts[index].querySelector("[data-testid=post-comment-root]") 
+				var postBy = usernameContent ? usernameContent.querySelector('a').getAttribute('title') : "sem nome de usuário."
+				console.debug('[like-post] curtindo a publicação de ', postBy);
+				eventFire(findLikeButton, 'click')
+				count++
+			}
+
+			/* incrementa o index */
+			index++;
+
+			if (index < posts.length){
+				doNextPromise(index)
+			}
+			else{
+				console.debug("[like-post] finalizado.");
+				console.debug('[like-post] posts curtidos hoje >>>>', count )
+				scroll('start')
+			}
+		  })
+	  }
+	console.debug(`[like-post] ${posts.length} posts encontrados. Iniciando...`)
+
+	/* inicia funcao recursiva para curtidas */
+	doNextPromise(0)
 }
 
-
+/**
+ * Method: like this firsts comments in the post
+ */
 var likeAll = () => {
 	var buttons = document.querySelectorAll('svg')
 	var buttonsArray = Array.from(buttons)
 	var likeButtonsArray = buttonsArray.filter(button => button.getAttribute('aria-label')==="Curtir")
-	console.log("tamanho >>>>> ", likeButtonsArray.length)
-	// var doNextPromise = (index) => {
-	// 	const time = generateTime(3000, 5000)
-	// 	console.log(index)
-	// 	sleep(time).then(()=>{
-	// 		console.log(likeButtonsArray[index])
-	// 		index++
-	// 		if(index < likeButtonsArray.length)
-	// 			doNextPromise(index)
-	// 		return console.log('finish')
-	// 	})
-	// }
-
 	const doNextPromise = (index) => {
 		sleep(generateTime(2000, 5000))
 		  .then(() => {
@@ -186,19 +200,3 @@ var likeAll = () => {
 	console.debug(`[all-comments] ${likeButtonsArray.length} comentários para curtir. Iniciando...`)
 	doNextPromise(0)
 }
-
-// var like = async () => {
-// 	if(count>=times){
-// 		return finish()
-// 	}
-// 	this.attArticles()
-// 	articles.reduce( (p, _, i) => 
-// 	    p.then(_ => new Promise(resolve =>
-// 	        setTimeout(function () {
-// 	            console.log(i);
-// 	            resolve();
-// 	        }, generateTime(2000))
-// 	    ))
-// 	, Promise.resolve() );
-// 	scroll('start')
-// }
