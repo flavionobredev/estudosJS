@@ -216,3 +216,25 @@ var likeAll = () => {
 	console.debug(`[all-comments] ${likeButtonsArray.length} comentários para curtir. Iniciando...`)
 	doNextPromise(0)
 }
+
+
+/**
+ * Method: like a random post in the profile
+ */
+var profileLike = () => {
+	var posts = document.querySelectorAll('article')[0].querySelectorAll('img')
+	var randomPost = Math.floor(Math.random()*posts.length)
+	eventFire(posts[randomPost], 'click')
+	
+	/* fica em um interval até que o post seja carregado na tela */
+	var interval = setInterval(()=> {
+		var deslikeButton = document.querySelector('svg[aria-label=Descurtir]')
+		if(!deslikeButton){
+			var likeButton = document.querySelector('svg[aria-label=Curtir]')
+			if(likeButton){
+				eventFire(likeButton, 'click')
+				clearInterval(interval)
+			}
+		}
+	}, 500)
+}
