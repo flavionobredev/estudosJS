@@ -141,23 +141,38 @@ var like = (articles) => {
 		var findDeslikeButton = buttonsArray.find(button => button.getAttribute('aria-label')==="Descurtir") 
 		var findLikeButton = buttonsArray.find(button => button.getAttribute('aria-label')==="Curtir")
 
-		// TODO: Ver forma de otimizar curtida pois: esta esperando timeout  ate de publicação ja curtida
-		sleep(generateTime(1000, 5000))
-		.then(() => {
-			
-			/* verifica se não existe uma publicação já curtida e se há botão de like  */
-			if (!findDeslikeButton && findLikeButton){
-				/* busca saber de quem é a postagem */
-				var usernameContent = posts[index].querySelector("[data-testid=post-comment-root]") 
-				var postBy = usernameContent ? usernameContent.querySelector('a').getAttribute('title') : "sem nome de usuário."
-				console.debug('[like-post] curtindo a publicação de ', postBy);
-				eventFire(findLikeButton, 'click')
-				count++
-			}
+
+		
+		/* verifica se não existe uma publicação já curtida e se há botão de like  */
+		if (!findDeslikeButton && findLikeButton){
+			/* busca saber de quem é a postagem */
+			var usernameContent = posts[index].querySelector("[data-testid=post-comment-root]") 
+			var postBy = usernameContent ? usernameContent.querySelector('a').getAttribute('title') : "sem nome de usuário."
+			console.debug('[like-post] curtindo a publicação de ', postBy);
+			eventFire(findLikeButton, 'click')
+			count++
+
+			sleep(generateTime(1000, 5000))
+			.then(() => {
+				
+	
+				/* incrementa o index */
+				index++;
+	
+				if (index < posts.length){
+					doNextPromise(index)
+				}
+				else{
+					console.debug("[like-post] finalizado.");
+					console.debug('[like-post] posts curtidos hoje >>>>', count )
+					scroll('start')
+				}
+			})
+		} else {
 
 			/* incrementa o index */
 			index++;
-
+	
 			if (index < posts.length){
 				doNextPromise(index)
 			}
@@ -166,8 +181,9 @@ var like = (articles) => {
 				console.debug('[like-post] posts curtidos hoje >>>>', count )
 				scroll('start')
 			}
-		  })
+		}
 	  }
+	  
 	console.debug(`[like-post] ${posts.length} posts encontrados. Iniciando...`)
 
 	/* inicia funcao recursiva para curtidas */
