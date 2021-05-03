@@ -193,10 +193,13 @@ var like = (articles) => {
 /**
  * Method: like this firsts comments in the post
  */
-var likeAll = () => {
+var likeComments = async () => {
 	var buttons = document.querySelectorAll('svg')
 	var buttonsArray = Array.from(buttons)
 	var likeButtonsArray = buttonsArray.filter(button => button.getAttribute('aria-label')==="Curtir")
+	var closeButton = document.querySelector('svg[aria-label=Fechar]')
+
+	
 	const doNextPromise = (index) => {
 		sleep(generateTime(2000, 5000))
 		  .then(() => {
@@ -208,6 +211,7 @@ var likeAll = () => {
 				doNextPromise(index)
 			}
 			else{
+				eventFire(closeButton, 'click')
 				console.debug("[all-comments] finalizado.");
 				console.debug('[all-comments] comentários curtidos hoje >>>>', likeAllCount )
 			}
@@ -228,13 +232,40 @@ var profileLike = () => {
 	
 	/* fica em um interval até que o post seja carregado na tela */
 	var interval = setInterval(()=> {
+		var closeButton = document.querySelector('svg[aria-label=Fechar]')
 		var deslikeButton = document.querySelector('svg[aria-label=Descurtir]')
 		if(!deslikeButton){
 			var likeButton = document.querySelector('svg[aria-label=Curtir]')
 			if(likeButton){
 				eventFire(likeButton, 'click')
 				clearInterval(interval)
+				eventFire(closeButton, 'click')
 			}
+		} else {
+			clearInterval(interval)
+			eventFire(closeButton, 'click')
+		}
+	}, 500)
+}
+
+
+/**
+ * Method: like firsts comments from a random post in the profile
+ */
+ var likeRandomComments = () => {
+	var posts = document.querySelectorAll('article')[0].querySelectorAll('img')
+	var randomPost = Math.floor(Math.random()*posts.length)
+	eventFire(posts[randomPost], 'click')
+	
+	/* fica em um interval até que o post seja carregado na tela */
+	var interval = setInterval(()=> {
+		var likeButton = document.querySelector('svg[aria-label=Curtir]')
+		if(likeButton){
+			clearInterval(interval)
+			console.log('eeeee')
+			likeComments()
+		} else {
+			clearInterval(interval)
 		}
 	}, 500)
 }
