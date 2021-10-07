@@ -25,7 +25,7 @@ class AppModule {
   }
 
   #initDatabase() {
-    this.#database = Database.connect();
+    this.#database = Database.forRoot();
     this.#database.on("connection", () => {
       console.log(`[${AppModule.name}] database running`);
     });
@@ -33,7 +33,6 @@ class AppModule {
       console.log(
         `[${AppModule.name}] database crashed. Closing application...`
       );
-      process.exit(1);
     });
   }
 }
