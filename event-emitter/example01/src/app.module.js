@@ -24,8 +24,8 @@ class AppModule {
     });
   }
 
-  #initDatabase() {
-    this.#database = Database.forRoot();
+  async #initDatabase() {
+    this.#database = await Database.forRoot();
     this.#database.on("connection", () => {
       console.log(`[${AppModule.name}] database running`);
     });
