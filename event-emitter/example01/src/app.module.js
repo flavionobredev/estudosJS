@@ -1,4 +1,5 @@
 const { Database } = require("./infra/database");
+const { AppController } = require("./app.controller");
 const http = require("http");
 
 class AppModule {
@@ -16,22 +17,30 @@ class AppModule {
     this.#app = app;
   }
 
-  bootstrap({ port }) {
-    this.#initDatabase();
+  async init({ port }) {
+    await this.#initDatabase();
+    this.#initControllers();
     this.#app.listen(port, () => {
-      console.log("Application is running");
+      console.log(`[${AppModule.name}] 🤺 App listen on port ${port}`);
     });
   }
 
-  #initDatabase() {
-    this.#database = Database.forRoot();
-    this.#database.on("connection", () => {
-      console.log(`[${AppModule.name}] database started`);
-    });
-    this.#database.on("error", () => {
-      console.log(
-        `[${AppModule.name}] database crashed. Closing application...`
-      );
+  #initControllers() {
+    AppController(this.#app, this.#database);
+  }
+
+  async #initDatabase() {
+    return new Promise((resolve, reject) => {
+      const connection = Database.forRoot();
+      connection.on("ready", (db) => {
+        this.#database = db;
+        console.log(connection);
+        console.log("this data base", this.#database);
+        resolve(console.log(`[${AppModule.name}] Database started`));
+      });
+      connection.on("error", () => {
+        reject(`[${AppModule.name}] Database crashed. Closing application...`);
+      });
     });
   }
 }

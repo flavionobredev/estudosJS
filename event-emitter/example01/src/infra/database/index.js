@@ -3,16 +3,20 @@ const { resolve } = require("path");
 const { createReadStream } = require("fs");
 const { Transform, Readable, Writable, pipeline } = require("stream");
 const { promisify } = require("util");
+const { Operations } = require("./operations");
 
 const pipelineAsync = promisify(pipeline);
 
 class Database extends EventEmitter {
   /**
-   * @type {Database}
+   * @type { Database }
    */
   static #instance = null;
 
-  #data = null;
+  /**
+   * @type {array}
+   */
+  #data = [];
 
   /**
    * path do banco de dados
@@ -26,11 +30,25 @@ class Database extends EventEmitter {
     this.#path = options.path ? options.path : this.#path;
   }
 
+  static get connection() {
+    return Database.#instance;
+  }
+
   static forRoot(options) {
     if (Database.#instance) return Database.#instance;
     Database.#instance = new Database(options);
     Database.#instance.#connect();
     return Database.#instance;
+  }
+
+  static Schema(schema) {
+    if (!this.#instance) return;
+    console.log("schema", schema, this.#instance.#data);
+    return schema;
+  }
+
+  static ModelBySchema(schema) {
+    return new Operations(this.#instance, schema, this.#instance.#data);
   }
 
   async #connect() {
@@ -69,9 +87,9 @@ class Database extends EventEmitter {
         stack: err,
       })
     );
-    this.emit("connection");
+
     this.#data = JSON.parse(dataInMemory);
-    console.log(this.#data);
+    this.emit("ready");
   }
 }
 

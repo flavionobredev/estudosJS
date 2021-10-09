@@ -1,5 +1,9 @@
 const AppModule = require("./app.module");
 const app = require("./app");
 
-const appModule = new AppModule(app);
-appModule.bootstrap({ port: 3000 });
+async function bootstrap() {
+  const appModule = new AppModule(app);
+  appModule.init({ port: 3000 });
+}
+
+bootstrap();
