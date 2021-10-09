@@ -12,7 +12,7 @@ const genAge = () => Math.floor(Math.random() * 30) + 18;
 function* genUsers() {
   for (let i = 0; i < 100; i++) {
     yield JSON.stringify({
-      _id: i,
+      _id: i + 1,
       name: `${names[genIndex()]} ${last[genIndex()]}`,
       age: genAge(),
       isDev: i % 2 === 0,
@@ -41,5 +41,4 @@ const parseToArray = Transform({
   },
 });
 
-// pipelineAsync(readUsers, parseToArray, process.stdout);
 pipelineAsync(readUsers, parseToArray, createWriteStream("database.json"));

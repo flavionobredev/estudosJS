@@ -26,11 +26,10 @@ class Database extends EventEmitter {
     this.#path = options.path ? options.path : this.#path;
   }
 
-  static async forRoot(options) {
+  static forRoot(options) {
     if (Database.#instance) return Database.#instance;
     Database.#instance = new Database(options);
-    await Database.#instance.#connect();
-    // if (!success) return process.exit(1);
+    Database.#instance.#connect();
     return Database.#instance;
   }
 

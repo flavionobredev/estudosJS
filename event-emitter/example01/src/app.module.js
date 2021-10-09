@@ -6,7 +6,6 @@ class AppModule {
    * @type {Database}
    */
   #database = null;
-  #controllers = null;
 
   /**
    * @type {http.Server}
@@ -14,20 +13,20 @@ class AppModule {
   #app = null;
 
   constructor(app) {
-    this.#initDatabase();
     this.#app = app;
   }
 
   bootstrap({ port }) {
+    this.#initDatabase();
     this.#app.listen(port, () => {
       console.log("Application is running");
     });
   }
 
-  async #initDatabase() {
-    this.#database = await Database.forRoot();
+  #initDatabase() {
+    this.#database = Database.forRoot();
     this.#database.on("connection", () => {
-      console.log(`[${AppModule.name}] database running`);
+      console.log(`[${AppModule.name}] database started`);
     });
     this.#database.on("error", () => {
       console.log(
