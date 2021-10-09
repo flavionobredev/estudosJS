@@ -10,7 +10,7 @@ const genIndex = () => Math.floor(Math.random() * 3);
 const genAge = () => Math.floor(Math.random() * 30) + 18;
 
 function* genUsers() {
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 100; i++) {
     yield JSON.stringify({
       _id: i,
       name: `${names[genIndex()]} ${last[genIndex()]}`,
@@ -35,13 +35,11 @@ const parseToArray = Transform({
     if (this.counter) {
       return cb(null, "," + chunk);
     }
-    console.log(this);
 
     this.counter += 1;
-    console.log("this counter", this.counter);
     cb(null, "[".concat(chunk));
   },
 });
 
-pipelineAsync(readUsers, parseToArray, process.stdout);
-// pipelineAsync(readUsers, createWriteStream("database2.json"));
+// pipelineAsync(readUsers, parseToArray, process.stdout);
+pipelineAsync(readUsers, parseToArray, createWriteStream("database.json"));
