@@ -8,7 +8,6 @@ module.exports = {
    * @param { AppService } appService
    */
   AppController: (app, appService) => {
-    // const appService = new AppService();
     app.on("request", (req, res) => {
       console.log("[AppController] ", req.method, req.url);
       if (req.url === "/users") {
