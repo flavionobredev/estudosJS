@@ -15,7 +15,9 @@ module.exports = {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify({ users: appService.getAllUsers() }));
+        return;
       }
+      res.end(`Cannot ${req.method} ${req.url}`);
     });
   },
 };
