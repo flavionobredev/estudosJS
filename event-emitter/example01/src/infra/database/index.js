@@ -41,9 +41,11 @@ class Database extends EventEmitter {
     return Database.#instance;
   }
 
+  get data() {
+    return this.#data;
+  }
+
   static Schema(schema) {
-    if (!this.#instance) return;
-    console.log("schema", schema, this.#instance.#data);
     return schema;
   }
 

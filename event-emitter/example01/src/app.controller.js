@@ -5,14 +5,16 @@ module.exports = {
   /**
    *
    * @param {http.Server} app
+   * @param { AppService } appService
    */
-  AppController: (app, db) => {
-    const appService = new AppService(db);
+  AppController: (app, appService) => {
+    // const appService = new AppService();
     app.on("request", (req, res) => {
       console.log("[AppController] ", req.method, req.url);
       if (req.url === "/users") {
         res.statusCode = 200;
-        res.end(appService.getAllUsers());
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify({ users: appService.getAllUsers() }));
       }
     });
   },
