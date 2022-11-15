@@ -1,0 +1,22 @@
+{
+  "name": "fastify-vs-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test:fastify": "npx autocannon -c 10 -d 60 localhost:3000",
+    "test:express": "npx autocannon -c 10 -d 60 localhost:3001"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "fastify": "^4.9.2",
+    "pino-http": "^8.2.1"
+  },
+  "devDependencies": {
+    "autocannon": "^7.10.0"
+  }
+}
