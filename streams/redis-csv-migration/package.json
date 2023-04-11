@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "backup": "node backup.js",
+    "restore": "node restore.js",
+    "clear-backup": "rm -rf ./data/backup.csv"
   },
   "author": "flavio nobre",
   "license": "ISC",
   "dependencies": {
+    "csvtojson": "^2.0.10",
     "redis": "^4.6.5"
   }
 }
